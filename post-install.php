@@ -105,8 +105,8 @@ function download_binary($system_info)
         "linux-aarch64" => "statsig-ffi-" . VERSION . "-debian-aarch64-unknown-linux-gnu-shared.zip",
         "linux-x86_64" => "statsig-ffi-" . VERSION . "-debian-x86_64-unknown-linux-gnu-shared.zip",
 
-        "linux-aarch64-musl" => "statsig-ffi-" . VERSION . "-alpine-aarch64-unknown-linux-musl-static.zip",
-        "linux-x86_64-musl" => "statsig-ffi-" . VERSION . "-alpine-x86_64-unknown-linux-musl-static.zip",
+        "linux-aarch64-musl" => "statsig-ffi-" . VERSION . "-alpine-aarch64-unknown-linux-musl-shared.zip",
+        "linux-x86_64-musl" => "statsig-ffi-" . VERSION . "-alpine-x86_64-unknown-linux-musl-shared.zip",
     ];
 
     $system_tag = $system_info[0] . "-" . $system_info[1];
