@@ -1,7 +1,7 @@
 <?php
 
 const OUTPUT_DIR = "resources";
-const VERSION = "0.0.5-beta.4";
+const VERSION = "0.0.9-alpha.1";
 
 if (getenv('SKIP_STATSIG_POST_INSTALL') === 'true') {
     exit(0);
@@ -49,25 +49,80 @@ function ensure_bin_dir_exists()
     }
 }
 
+function remove_existing_statsig_resources()
+{
+    $dir = OUTPUT_DIR;
+
+    $files = scandir($dir);
+    foreach ($files as $file) {
+        if (strpos($file, "statsig_ffi") !== false) {
+            unlink($dir . '/' . $file);
+        }
+    }
+}
+
+function isMusl($os)
+{
+    if ($os !== 'linux') {
+        return false;
+    }
+
+    function isMuslFromFilesystem()
+    {
+        try {
+            $output = file_get_contents('/usr/bin/ldd');
+            return strpos($output, 'musl') !== false;
+        } catch (Exception) {
+            return null;
+        }
+    }
+
+    function isMuslFromChildProcess()
+    {
+        try {
+            $output = shell_exec('ldd --version');
+            return strpos($output, 'musl') !== false;
+        } catch (Exception) {
+            return false;
+        }
+    }
+
+    $musl = isMuslFromFilesystem();
+    if ($musl === null) {
+        $musl = isMuslFromChildProcess();
+    }
+
+    return $musl === true;
+}
+
+
 function download_binary($system_info)
 {
     $binary_map = [
-        "macos-x86_64" => "statsig-ffi-x86_64-apple-darwin.zip",
-        "macos-aarch64" => "statsig-ffi-aarch64-apple-darwin.zip",
-        "linux-aarch64" => "statsig-ffi-aarch64-unknown-linux-gnu.zip",
-        "linux-x86_64" => "statsig-ffi-x86_64-unknown-linux-gnu.zip",
-        "windows-x86_64" => "statsig-ffi-x86_64-pc-windows-msvc.zip",
-        "windows-aarch64" => "statsig-ffi-aarch64-pc-windows-msvc.zip",
+        "macos-aarch64" => "statsig-ffi-" . VERSION . "-aarch64-apple-darwin-shared.zip",
+        "macos-x86_64" => "statsig-ffi-" . VERSION . "-x86_64-apple-darwin-shared.zip",
+
+        "linux-aarch64" => "statsig-ffi-" . VERSION . "-debian-aarch64-unknown-linux-gnu-shared.zip",
+        "linux-x86_64" => "statsig-ffi-" . VERSION . "-debian-x86_64-unknown-linux-gnu-shared.zip",
+
+        "linux-aarch64-musl" => "statsig-ffi-" . VERSION . "-alpine-aarch64-unknown-linux-musl-static.zip",
+        "linux-x86_64-musl" => "statsig-ffi-" . VERSION . "-alpine-x86_64-unknown-linux-musl-static.zip",
     ];
 
-    $binary_file = $binary_map[$system_info[0] . "-" . $system_info[1]] ?? null;
+    $system_tag = $system_info[0] . "-" . $system_info[1];
+    if (isMusl($system_info[0])) {
+        $system_tag .= "-musl";
+    }
+
+    $binary_file = $binary_map[$system_tag] ?? null;
 
     if ($binary_file === null) {
-        echo "No binary found for: {$system_info[0]} {$system_info[1]}\n";
+        echo "No binary found for: {$system_tag}\n";
         exit(1);
     }
 
-    $url = "https://github.com/statsig-io/statsig-core-php/releases/download/" . VERSION . "/" . $binary_file;
+    // $url = "https://github.com/statsig-io/statsig-server-core/releases/download/" . VERSION . "/" . $binary_file;
+    $url = "https://github.com/statsig-io/statsig-php-core/releases/download/" . VERSION . "/" . $binary_file;
 
     echo "Downloading binary from $url\n";
 
@@ -85,7 +140,7 @@ function unzip_binary($zip_file_path)
     if ($zip->open($zip_file_path) === TRUE) {
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $filename = $zip->getNameIndex($i);
-            if (in_array($filename, ['libstatsig_ffi.dylib', 'statsig_ffi.dll', 'libstatsig_ffi.so'])) {
+            if (in_array($filename, ['libstatsig_ffi.dylib', 'statsig_ffi.dll', 'libstatsig_ffi.so', 'libstatsig_ffi.a'])) {
                 $zip->extractTo(OUTPUT_DIR, $filename);
                 echo "Extracted $filename\n";
             }
@@ -109,7 +164,9 @@ function unzip_binary($zip_file_path)
 
 function download_header()
 {
-    $url = "https://github.com/statsig-io/statsig-core-php/releases/download/" . VERSION . "/statsig_ffi.h";
+    // $url = "https://github.com/statsig-io/statsig-server-core/releases/download/" . VERSION . "/statsig_ffi.h";
+    $url = "https://github.com/statsig-io/statsig-php-core/releases/download/" . VERSION . "/statsig_ffi.h";
+
     echo "Downloading header from $url\n";
 
     $output_path = OUTPUT_DIR . "/statsig_ffi.h";
@@ -119,6 +176,8 @@ function download_header()
 
 $system_info = get_system_info();
 ensure_bin_dir_exists();
+remove_existing_statsig_resources();
+
 $zip_file_path = download_binary($system_info);
 unzip_binary($zip_file_path);
 download_header();
