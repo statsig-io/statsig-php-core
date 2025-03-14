@@ -1,5 +1,5 @@
 {
-    "name": "statsig/statsig-core-php",
+    "name": "statsig/statsig-php-core",
     "type": "library",
     "license": "ISC",
     "description": "Statsig PHP SDK",
