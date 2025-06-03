@@ -24,7 +24,7 @@ class StatsigRepeatedUsageTest extends TestCase
         parent::setUp();
 
         $dir = dirname(__FILE__);
-        $data = file_get_contents($dir . '/../../statsig-lib/tests/data/eval_proj_dcs.json');
+        $data = file_get_contents($dir . '/../../statsig-rust/tests/data/eval_proj_dcs.json');
 
         $this->server = new MockServer();
         $this->server->mock('/v2/download_config_specs/' . SDK_KEY . '.json', $data);
@@ -32,7 +32,11 @@ class StatsigRepeatedUsageTest extends TestCase
 
         TestHelpers::ensureEmptyDir(TEST_DIR);
 
-        $adapter = new StatsigLocalFileSpecsAdapter(SDK_KEY, TEST_DIR, $this->server->getUrl() . "/v2/download_config_specs");
+        $adapter = new StatsigLocalFileSpecsAdapter(
+            SDK_KEY,
+            TEST_DIR,
+            $this->server->getUrl() . "/v2/download_config_specs"
+        );
         $adapter->syncSpecsFromNetwork();
     }
 
@@ -46,8 +50,16 @@ class StatsigRepeatedUsageTest extends TestCase
         $options = new StatsigOptions(
             null,
             null,
-            new StatsigLocalFileSpecsAdapter(SDK_KEY, TEST_DIR, $this->server->getUrl() . "/v2/download_config_specs"),
-            new StatsigLocalFileEventLoggingAdapter(SDK_KEY, TEST_DIR, $this->server->getUrl() . "/v1/log_event")
+            new StatsigLocalFileSpecsAdapter(
+                SDK_KEY,
+                TEST_DIR,
+                $this->server->getUrl() . "/v2/download_config_specs"
+            ),
+            new StatsigLocalFileEventLoggingAdapter(
+                SDK_KEY,
+                TEST_DIR,
+                $this->server->getUrl() . "/v1/log_event"
+            )
         );
 
         $statsig = new Statsig(SDK_KEY, $options);
@@ -67,7 +79,11 @@ class StatsigRepeatedUsageTest extends TestCase
             unset($statsig);
         }
 
-        $logging_adapter = new StatsigLocalFileEventLoggingAdapter(SDK_KEY, TEST_DIR, $this->server->getUrl() . "/v1/log_event");
+        $logging_adapter = new StatsigLocalFileEventLoggingAdapter(
+            SDK_KEY,
+            TEST_DIR,
+            $this->server->getUrl() . "/v1/log_event"
+        );
         $logging_adapter->sendPendingEvents();
 
         // logged each exposure
