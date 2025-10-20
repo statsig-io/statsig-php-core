@@ -5,8 +5,6 @@ namespace Statsig;
 class StatsigUser
 {
     public $__ref = null; // phpcs:ignore
-    public $user_id = "";
-    public $custom_ids = [];
 
     public function __construct(
         string $user_id,
@@ -20,8 +18,6 @@ class StatsigUser
         ?array $custom = null,
         ?array $private_attributes = null
     ) {
-        $this->user_id = $user_id;
-        $this->custom_ids = $custom_ids;
         $ffi = StatsigFFI::get();
         $this->__ref = $ffi->statsig_user_create(
             $user_id,
