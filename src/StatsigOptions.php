@@ -27,8 +27,7 @@ class StatsigOptions
         ?int $init_timeout_ms = null,
         ?bool $fallback_to_statsig_api = null,
         ?bool $use_third_party_ua_parser = null,
-        ?PersistentStorage $persistent_storage = null,
-        ?ProxyConfig $proxy_config = null
+        ?PersistentStorage $persistent_storage = null
     ) {
         $ffi = StatsigFFI::get();
         $this->__ref = $ffi->statsig_options_create(
@@ -55,10 +54,10 @@ class StatsigOptions
             $init_timeout_ms ?? -1,
             toSafeOptBool($fallback_to_statsig_api),
             toSafeOptBool($use_third_party_ua_parser),
-            $proxy_config !== null ? $proxy_config->proxyHost : null,
-            $proxy_config !== null ? $proxy_config->proxyPort : 0,
-            $proxy_config !== null ? $proxy_config->proxyAuth : null,
-            $proxy_config !== null ? $proxy_config->proxyProtocol : null,
+            null, // todo: proxy host
+            0, // todo: proxy port
+            null, // todo: proxy auth
+            null, // todo: proxy protocol
             is_null($persistent_storage) ? 0 : $persistent_storage->__ref
         );
     }
