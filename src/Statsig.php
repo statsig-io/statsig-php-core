@@ -147,6 +147,18 @@ class Statsig
      * Experiment Functions
      */
 
+    /**
+     * Supported $options keys:
+     * - disable_exposure_logging (bool)
+     * - user_persisted_values (array): map of config name to sticky values, as
+     *   saved through PersistentStorage. Only honored when a persistent
+     *   storage adapter is configured on StatsigOptions.
+     * - enforce_overrides (bool): when a persisted sticky value exists, let a
+     *   matching console override rule take precedence over it.
+     * - enforce_targeting (bool): when a persisted sticky value exists,
+     *   re-check targeting and drop the sticky value if the user no longer
+     *   passes targeting.
+     */
     public function getExperiment(StatsigUser $user, string $name, ?array $options = null): Experiment
     {
         $ptr = StatsigFFI::get()->statsig_get_experiment(
@@ -225,6 +237,9 @@ class Statsig
      * Layer Functions
      */
 
+    /**
+     * Supported $options keys: see getExperiment().
+     */
     public function getLayer(StatsigUser $user, string $name, ?array $options = null): Layer
     {
         $ptr = StatsigFFI::get()->statsig_get_layer(
