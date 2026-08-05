@@ -268,6 +268,57 @@ class Statsig
      * Entity List Functions
      */
 
+    public function getFeatureGateList(): array
+    {
+        $ffi = StatsigFFI::get();
+        // $len satisfies the required uint64_t* out-param; its written value is
+        // unused because takeString reads the NUL-terminated JSON payload.
+        $len = $ffi->new('uint64_t');
+        $ptr = $ffi->statsig_get_feature_gate_list($this->__ref, \FFI::addr($len));
+
+        if (\FFI::isNull($ptr)) {
+            return [];
+        }
+
+        $raw_result = StatsigFFI::takeString($ptr);
+        $decoded = json_decode($raw_result, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function getDynamicConfigList(): array
+    {
+        $ffi = StatsigFFI::get();
+        // $len satisfies the required uint64_t* out-param; its written value is
+        // unused because takeString reads the NUL-terminated JSON payload.
+        $len = $ffi->new('uint64_t');
+        $ptr = $ffi->statsig_get_dynamic_config_list($this->__ref, \FFI::addr($len));
+
+        if (\FFI::isNull($ptr)) {
+            return [];
+        }
+
+        $raw_result = StatsigFFI::takeString($ptr);
+        $decoded = json_decode($raw_result, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function getExperimentList(): array
+    {
+        $ffi = StatsigFFI::get();
+        // $len satisfies the required uint64_t* out-param; its written value is
+        // unused because takeString reads the NUL-terminated JSON payload.
+        $len = $ffi->new('uint64_t');
+        $ptr = $ffi->statsig_get_experiment_list($this->__ref, \FFI::addr($len));
+
+        if (\FFI::isNull($ptr)) {
+            return [];
+        }
+
+        $raw_result = StatsigFFI::takeString($ptr);
+        $decoded = json_decode($raw_result, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
     public function getAutotuneList(): array
     {
         $ffi = StatsigFFI::get();
@@ -275,6 +326,23 @@ class Statsig
         // unused because takeString reads the NUL-terminated JSON payload.
         $len = $ffi->new('uint64_t');
         $ptr = $ffi->statsig_get_autotune_list($this->__ref, \FFI::addr($len));
+
+        if (\FFI::isNull($ptr)) {
+            return [];
+        }
+
+        $raw_result = StatsigFFI::takeString($ptr);
+        $decoded = json_decode($raw_result, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function getLayerList(): array
+    {
+        $ffi = StatsigFFI::get();
+        // $len satisfies the required uint64_t* out-param; its written value is
+        // unused because takeString reads the NUL-terminated JSON payload.
+        $len = $ffi->new('uint64_t');
+        $ptr = $ffi->statsig_get_layer_list($this->__ref, \FFI::addr($len));
 
         if (\FFI::isNull($ptr)) {
             return [];
