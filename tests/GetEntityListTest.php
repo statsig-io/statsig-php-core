@@ -76,4 +76,20 @@ class GetEntityListTest extends TestCase
         $this->assertIsArray($layer_list);
         $this->assertContains('test_layer', $layer_list);
     }
+
+    public function testGetParameterStoreList()
+    {
+        $parameter_store_list = $this->initStatsig()->getParameterStoreList();
+
+        $this->assertIsArray($parameter_store_list);
+        $this->assertContains('test_parameter_store', $parameter_store_list);
+    }
+
+    public function testGetAutotuneList()
+    {
+        $autotune_list = $this->initStatsig()->getAutotuneList();
+
+        $this->assertIsArray($autotune_list);
+        $this->assertContains('test_autotune', $autotune_list);
+    }
 }
